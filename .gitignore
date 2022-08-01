@@ -1,0 +1,16 @@
+*.aux
+*.out
+*.fls
+*.bbl
+*.blg
+*.log
+*.synctex.gz
+*_latexmk
+
+code/.*
+*__pycache__
+code/data
+code/results
+.history
+.vscode
+seafile-ignore.txt
