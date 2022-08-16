@@ -223,9 +223,9 @@ def get_single_run(directory, weight, dx, FWHM, max_velocity, threshold=0):
                                                 levels=4,  # start with a grid size 2^4x2^4
                                                 maxlevel=int(np.ceil(np.log2(data.shape[1]))),
                                                 )
-            save(fname['recon'], DM=recon, CB=cback)
-            F.gif(fname['gif'], recon, scale=4 * 255)
-            F.gif(fname['trace'], recon, scale=4 * 255, trace=5)
+            # # Don't record videos automatically:
+            # F.gif(fname['gif'], OT.toarray(recon), scale=4 * 255)
+            # F.gif(fname['trace'], recon.copy(OT.toarray(recon)), scale=4 * 255, trace=5)
 
         return fname, recon, cback
 

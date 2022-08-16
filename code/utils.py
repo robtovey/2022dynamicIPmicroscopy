@@ -496,8 +496,10 @@ def get_single_run(directory, weight, dx, FWHM, max_velocity, threshold=0):
                                                 maxlevel=int(np.ceil(np.log2(data.shape[1]))),
                                                 )
             save(fname['recon'], DM=recon, CB=cback)
-            F.gif(fname['gif'], OT.toarray(recon), scale=4 * 255)
-            F.gif(fname['trace'], recon.copy(OT.toarray(recon)), scale=4 * 255, trace=5)
+
+            # # Don't record videos automatically:
+            # F.gif(fname['gif'], OT.toarray(recon), scale=4 * 255)
+            # F.gif(fname['trace'], recon.copy(OT.toarray(recon)), scale=4 * 255, trace=5)
         recon.arr = toarray(recon.arr, False, p)  # always save 'smooth' parametrisation but return 'real' one
 
         return fname, recon, cback
