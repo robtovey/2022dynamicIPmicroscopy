@@ -1,0 +1,19 @@
+name: dynamicIP
+channels:
+  - defaults
+dependencies:
+  - python=3.7
+  - pip
+  - numpy
+  - numba
+  - llvm
+  - scipy
+  - matplotlib
+  - ffmpeg            # probably just for notebook
+  - pot               # only for open cl
+  - pyopencl          # only for open cl
+  - notebook          # just for notebook
+  - ipykernel         # just for notebook
+  - ipywidgets        # just for notebook
+  - tqdm              # just for notebook
+  - tifffile          # just for notebook
