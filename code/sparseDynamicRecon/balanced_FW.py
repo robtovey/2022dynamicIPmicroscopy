@@ -4,7 +4,7 @@ Created on 12 Apr 2021
 @author: Rob Tovey
 '''
 import numpy as np
-from .DynamicPathSelect import bestPath, regularBestPath
+from .DynamicPathSelect import bestPath, regularBestPath, midTimePath
 from .optimisation_algs import FWFactory1, FWFactory2
 
 
@@ -29,12 +29,12 @@ def randomDynamicFW(fidelity, OT, nAtoms=1, meshsize=1, **kwargs):
 
 def uniformDynamicFW(fidelity, OT, nAtoms=1, levels=1, maxlevel=7, **kwargs):
     assert OT.balanced
-    pms = {'levels': levels, 'maxlevel': maxlevel, 'stepped': False}
+    pms = {'levels': levels, 'maxlevel': maxlevel, 'stepped': False, 'level_its':0}
 
     def get_paths(rho, F, bounds):
         mesh = np.meshgrid(*[np.linspace(bounds[0][i], bounds[1][i], 2 ** pms['levels'] + 1)
                              for i in range(1, 3)], indexing='ij')
-        mesh = np.concatenate([m[:, :, None] for m in mesh], axis=2)
+        mesh = np.concatenate([m[:,:, None] for m in mesh], axis=2)
         return regularBestPath(F(x=mesh.reshape(-1, 2)), mesh, OT.kernel[2], rho.T, nAtoms=nAtoms, vel=OT.velocity)
 
     return FWFactory2(*FWFactory1(fidelity, OT, get_paths, pms=pms, **kwargs))
@@ -42,23 +42,23 @@ def uniformDynamicFW(fidelity, OT, nAtoms=1, levels=1, maxlevel=7, **kwargs):
 
 def uniformRadiusDynamicFW(fidelity, OT, nAtoms=1, levels=1, maxvel=None, **kwargs):
     assert OT.balanced
-    N = 2**levels
+    N = 2 ** levels
     maxvel = OT.velocity if maxvel is None else maxvel
     # This is a bit of a hack, 'levels' argument refers to resolution but
     # 'levels' parameter is the radius of search.
-    pms = {'levels': 2, 'maxlevel': np.inf, 'stepped': False}
+    pms = {'levels': 2, 'maxlevel': np.inf, 'stepped': False, 'level_its':0}
 
     def get_paths(rho, F, bounds):
         # velocity of 1 pixel per time interval:
         pxps = max(bounds[1][i] - bounds[0][i] for i in range(1, 3)) / (N * (OT.T[1] - OT.T[0]))
-        vel = min(maxvel, pxps * 2**pms['levels'])
+        vel = min(maxvel, pxps * 2 ** pms['levels'])
         pms['maxlevel'] = np.ceil(np.log2(min(maxvel / pxps, N)))
         # a stupid check if the initial level parameter is too large
         pms['levels'] = min(pms['levels'], pms['maxlevel'])
 
         mesh = np.meshgrid(*[np.linspace(bounds[0][i], bounds[1][i], N + 1)
                              for i in range(1, 3)], indexing='ij')
-        mesh = np.concatenate([m[:, :, None] for m in mesh], axis=2)
+        mesh = np.concatenate([m[:,:, None] for m in mesh], axis=2)
         return regularBestPath(F(x=mesh.reshape(-1, 2)), mesh, OT.kernel[2], rho.T, nAtoms=nAtoms, vel=vel)
 
     return FWFactory2(*FWFactory1(fidelity, OT, get_paths, pms=pms, **kwargs))

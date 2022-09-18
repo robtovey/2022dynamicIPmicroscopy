@@ -282,7 +282,9 @@ def _regularBestPath(lin, M, C, T, E0, E1, path0, path1, rad):
 
 try:
     import pyopencl as cl;  # warnings.filterwarnings('ignore', category=cl.CompilerWarning)
-    ctx = cl.create_some_context(interactive=False); queue = cl.CommandQueue(ctx)
+    devices = sorted([d for p in cl.get_platforms() for d in p.get_devices()], key=lambda d: d.get_info(cl.device_info.MAX_WORK_GROUP_SIZE))
+    ctx = cl.Context(devices=devices[-1:]) # hopefully most powerful device
+    queue = cl.CommandQueue(ctx)
     cl_mf = cl.mem_flags
 
     _regularBestPath_cl = cl.Program(ctx, '''
